@@ -1,11 +1,14 @@
 package io.quarkus.amazon.dynamodb.enhanced.runtime;
 
+import java.util.List;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 
 import io.quarkus.arc.DefaultBean;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClientExtension;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
@@ -16,12 +19,12 @@ public class DynamodbEnhancedClientProducer {
 
     private DynamoDbEnhancedAsyncClient asyncEnhancedClient;
 
-    public void setDynamoDbClient(DynamoDbClient client) {
-        syncEnhancedClient = DynamoDbEnhancedClient.builder().dynamoDbClient(client).build();
+    public void setDynamoDbClient(DynamoDbClient client, List<DynamoDbEnhancedClientExtension> extensionList) {
+        syncEnhancedClient = DynamoDbEnhancedClient.builder().dynamoDbClient(client).extensions(extensionList).build();
     }
 
-    public void setDynamoDbAsyncClient(DynamoDbAsyncClient client) {
-        asyncEnhancedClient = DynamoDbEnhancedAsyncClient.builder().dynamoDbClient(client).build();
+    public void setDynamoDbAsyncClient(DynamoDbAsyncClient client, List<DynamoDbEnhancedClientExtension> extensionList) {
+        asyncEnhancedClient = DynamoDbEnhancedAsyncClient.builder().dynamoDbClient(client).extensions(extensionList).build();
     }
 
     @DefaultBean

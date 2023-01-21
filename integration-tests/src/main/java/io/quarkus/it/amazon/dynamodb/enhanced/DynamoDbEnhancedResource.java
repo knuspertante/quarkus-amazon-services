@@ -88,4 +88,36 @@ public class DynamoDbEnhancedResource {
             return "ERROR";
         }
     }
+
+    @GET
+    @Path("blocking/timestamp")
+    @Produces(TEXT_PLAIN)
+    public String testBlockingDynamoTimestamp() {
+        LOG.info("Testing Blocking Dynamodb client with table: " + BLOCKING_TABLE);
+
+        String partitionKeyAsString = UUID.randomUUID().toString();
+        String rangeId = UUID.randomUUID().toString();
+
+        DynamoDbTable<DynamoDBExampleTableEntry> exampleBlockingTable = dynamoEnhancedClient.table(BLOCKING_TABLE,
+                TableSchema.fromClass(DynamoDBExampleTableEntry.class));
+
+        exampleBlockingTable.createTable();
+
+        DynamoDBExampleTableEntry exampleTableEntry = new DynamoDBExampleTableEntry();
+        exampleTableEntry.setKeyId(partitionKeyAsString);
+        exampleTableEntry.setRangeId(rangeId);
+        exampleTableEntry.setPayload(PAYLOAD_VALUE);
+
+        exampleBlockingTable.putItem(exampleTableEntry);
+
+        Key partitionKey = Key.builder().partitionValue(partitionKeyAsString).build();
+
+        DynamoDBExampleTableEntry existingTableEntry = exampleBlockingTable.getItem(partitionKey);
+
+        if (existingTableEntry != null && existingTableEntry.getCreatedAtTimestamp() != null) {
+            return existingTableEntry.getCreatedAtTimestamp().toString();
+        } else {
+            return "";
+        }
+    }
 }
