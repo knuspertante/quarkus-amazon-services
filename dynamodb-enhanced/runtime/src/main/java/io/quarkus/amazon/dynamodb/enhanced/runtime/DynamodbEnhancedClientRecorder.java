@@ -1,5 +1,8 @@
 package io.quarkus.amazon.dynamodb.enhanced.runtime;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import io.quarkus.arc.runtime.BeanContainer;
 import io.quarkus.arc.runtime.BeanContainerListener;
 import io.quarkus.runtime.annotations.Recorder;
@@ -11,18 +14,14 @@ import software.amazon.awssdk.enhanced.dynamodb.internal.extensions.ChainExtensi
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
-import javax.inject.Inject;
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Recorder
 public class DynamodbEnhancedClientRecorder {
 
     DynamoDbEnhancedBuildTimeConfig buildTimeConfig;
 
-public DynamodbEnhancedClientRecorder(DynamoDbEnhancedBuildTimeConfig buildTimeConfig) {
-    this.buildTimeConfig = buildTimeConfig;
-}
+    public DynamodbEnhancedClientRecorder(DynamoDbEnhancedBuildTimeConfig buildTimeConfig) {
+        this.buildTimeConfig = buildTimeConfig;
+    }
 
     public BeanContainerListener setDynamoDbClient() {
         BeanContainerListener beanContainerListener = new BeanContainerListener() {
