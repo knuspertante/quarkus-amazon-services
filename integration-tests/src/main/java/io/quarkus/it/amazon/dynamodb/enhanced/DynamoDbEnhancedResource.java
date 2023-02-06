@@ -90,9 +90,9 @@ public class DynamoDbEnhancedResource {
     }
 
     @GET
-    @Path("blocking/timestamp")
+    @Path("blocking/extensions")
     @Produces(TEXT_PLAIN)
-    public String testBlockingDynamoTimestamp() {
+    public String testBlockingDynamoExtension() {
         LOG.info("Testing Blocking Dynamodb client with table: " + BLOCKING_TABLE);
 
         String partitionKeyAsString = UUID.randomUUID().toString();
@@ -115,7 +115,7 @@ public class DynamoDbEnhancedResource {
         DynamoDBExampleTableEntry existingTableEntry = exampleBlockingTable.getItem(partitionKey);
 
         if (existingTableEntry != null && existingTableEntry.getCreatedAtTimestamp() != null) {
-            return existingTableEntry.getCreatedAtTimestamp().toString();
+            return existingTableEntry.getPayload() + "@" + existingTableEntry.getVersion();
         } else {
             return "";
         }
