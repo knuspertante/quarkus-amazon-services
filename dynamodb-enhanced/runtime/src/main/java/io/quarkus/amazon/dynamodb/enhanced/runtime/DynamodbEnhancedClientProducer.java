@@ -1,6 +1,5 @@
 package io.quarkus.amazon.dynamodb.enhanced.runtime;
 
-
 import java.util.List;
 
 import jakarta.enterprise.context.ApplicationScoped;
