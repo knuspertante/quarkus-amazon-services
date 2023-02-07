@@ -5,22 +5,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.quarkus.it.amazon.dynamodb.DynamoDBUtils;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClientExtension;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbExtensionContext.AfterRead;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbExtensionContext.BeforeWrite;
-import software.amazon.awssdk.enhanced.dynamodb.extensions.ReadModification;
 import software.amazon.awssdk.enhanced.dynamodb.extensions.WriteModification;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
 public class MyExtension implements software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClientExtension {
 
     @Override
-    public ReadModification afterRead(AfterRead context) {
-        return DynamoDbEnhancedClientExtension.super.afterRead(context);
-    }
-
-    @Override
     public WriteModification beforeWrite(BeforeWrite context) {
+
         Map<String, AttributeValue> item = new HashMap<>(context.items());
 
         Map<String, AttributeValue> itemToTransform = new HashMap<>(item);
@@ -33,6 +26,6 @@ public class MyExtension implements software.amazon.awssdk.enhanced.dynamodb.Dyn
     }
 
     private AttributeValue modifyPayload(AttributeValue payload) {
-        return AttributeValue.builder().s("INTERCEPTED " + payload.s()).build();
+        return AttributeValue.builder().s("EXTENSION " + payload.s()).build();
     }
 }
