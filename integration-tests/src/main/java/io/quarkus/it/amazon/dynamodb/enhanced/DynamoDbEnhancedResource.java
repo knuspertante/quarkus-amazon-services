@@ -13,6 +13,7 @@ import javax.ws.rs.Produces;
 import org.jboss.logging.Logger;
 
 import software.amazon.awssdk.enhanced.dynamodb.*;
+import software.amazon.awssdk.services.dynamodb.model.ResourceInUseException;
 
 @Path("/dynamodbenhanced")
 public class DynamoDbEnhancedResource {
@@ -47,10 +48,8 @@ public class DynamoDbEnhancedResource {
 
         Key partitionKey = Key.builder().partitionValue(partitionKeyAsString).build();
 
-        return exampleAsyncTable.createTable()
-                .thenCompose(t -> exampleAsyncTable.putItem(exampleTableEntry))
-                .thenCompose(t -> exampleAsyncTable.getItem(partitionKey))
-                .thenApply(p -> p.getPayload() + "@" + p.getVersion())
+        return exampleAsyncTable.createTable().thenCompose(t -> exampleAsyncTable.putItem(exampleTableEntry))
+                .thenCompose(t -> exampleAsyncTable.getItem(partitionKey)).thenApply(p -> p.getPayload() + "@" + p.getVersion())
                 .exceptionally(th -> {
                     LOG.error("Error during async Dynamodb operations", th.getCause());
                     return "ERROR";
@@ -69,7 +68,11 @@ public class DynamoDbEnhancedResource {
         DynamoDbTable<DynamoDBExampleTableEntry> exampleBlockingTable = dynamoEnhancedClient.table(BLOCKING_TABLE,
                 TableSchema.fromClass(DynamoDBExampleTableEntry.class));
 
-        exampleBlockingTable.createTable();
+        try {
+            exampleBlockingTable.createTable();
+        } catch (ResourceInUseException e) {
+            LOG.info("Reused existing table");
+        }
 
         DynamoDBExampleTableEntry exampleTableEntry = new DynamoDBExampleTableEntry();
         exampleTableEntry.setKeyId(partitionKeyAsString);
@@ -101,7 +104,11 @@ public class DynamoDbEnhancedResource {
         DynamoDbTable<DynamoDBExampleTableEntry> exampleBlockingTable = dynamoEnhancedClient.table(BLOCKING_TABLE,
                 TableSchema.fromClass(DynamoDBExampleTableEntry.class));
 
-        exampleBlockingTable.createTable();
+        try {
+            exampleBlockingTable.createTable();
+        } catch (ResourceInUseException e) {
+            LOG.info("Reused existing table");
+        }
 
         DynamoDBExampleTableEntry exampleTableEntry = new DynamoDBExampleTableEntry();
         exampleTableEntry.setKeyId(partitionKeyAsString);

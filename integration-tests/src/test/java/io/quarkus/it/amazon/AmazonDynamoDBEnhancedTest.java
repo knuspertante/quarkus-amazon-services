@@ -13,12 +13,12 @@ public class AmazonDynamoDBEnhancedTest {
 
     @Test
     public void testDynamoDbAsync() {
-        RestAssured.when().get("/test/dynamodbenhanced/async").then().body(is("INTERCEPTED OK@1"));
+        RestAssured.when().get("/test/dynamodbenhanced/async").then().body(is("INTERCEPTED INTERCEPTED OK@1"));
     }
 
     @Test
     public void testDynamoDbBlocking() {
-        RestAssured.when().get("/test/dynamodbenhanced/blocking").then().body(is("INTERCEPTED OK@1"));
+        RestAssured.when().get("/test/dynamodbenhanced/blocking").then().body(is("INTERCEPTED INTERCEPTED OK@1"));
     }
 
     @Test

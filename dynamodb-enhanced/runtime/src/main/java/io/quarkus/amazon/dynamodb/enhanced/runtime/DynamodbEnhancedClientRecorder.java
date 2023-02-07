@@ -34,8 +34,7 @@ public class DynamodbEnhancedClientRecorder {
             @Override
             public void created(BeanContainer container) {
                 DynamodbEnhancedClientProducer producer = container.beanInstance(DynamodbEnhancedClientProducer.class);
-                producer.setDynamoDbClient(container.beanInstance(DynamoDbClient.class),
-                        createExtensionList());
+                producer.setDynamoDbClient(container.beanInstance(DynamoDbClient.class), createExtensionList());
             }
         };
 
@@ -48,8 +47,7 @@ public class DynamodbEnhancedClientRecorder {
             @Override
             public void created(BeanContainer container) {
                 DynamodbEnhancedClientProducer producer = container.beanInstance(DynamodbEnhancedClientProducer.class);
-                producer.setDynamoDbAsyncClient(container.beanInstance(DynamoDbAsyncClient.class),
-                        createExtensionList());
+                producer.setDynamoDbAsyncClient(container.beanInstance(DynamoDbAsyncClient.class), createExtensionList());
             }
         };
 
@@ -59,37 +57,39 @@ public class DynamodbEnhancedClientRecorder {
     private List<DynamoDbEnhancedClientExtension> createExtensionList() {
 
         List<DynamoDbEnhancedClientExtension> extensions = new ArrayList<>();
-        buildTimeConfig.clientExtensions.orElse(Collections.emptyList()).stream()
-                .map(String::trim)
-                .map(this::createExtension)
-                .filter(Objects::nonNull)
-                .forEach(extensions::add);
+        for (String item : buildTimeConfig.clientExtensions.orElse(Collections.emptyList())) {
+            DynamoDbEnhancedClientExtension extension = createExtension(item.trim());
+            if (Objects.nonNull(extension)) {
+                extensions.add(extension);
+            }
+        }
         if (extensions.isEmpty()) {
             extensions.addAll(ExtensionResolver.defaultExtensions());
         }
-
         return extensions;
     }
 
     private DynamoDbEnhancedClientExtension createExtension(String extensionClassName) {
-        try {
-            Class<?> clazz = Class
-                    .forName(extensionClassName, false, Thread.currentThread().getContextClassLoader());
 
+        Class<?> clazz = null;
+        try {
+            clazz = Class.forName(extensionClassName, false, Thread.currentThread().getContextClassLoader());
+            // try builder pattern in aws sdk
             Method builderMethod = clazz.getMethod("builder");
-            if (builderMethod != null) {
-                // try builder pattern in aws sdk
-                Object builder = builderMethod.invoke(null);
-                DynamoDbEnhancedClientExtension extension = (DynamoDbEnhancedClientExtension) builder.getClass()
-                        .getMethod("build").invoke(builder);
-                return extension;
-            } else {
-                return (DynamoDbEnhancedClientExtension) clazz.getDeclaredConstructor().newInstance();
-            }
-        } catch (ClassNotFoundException | ClassCastException | InstantiationException | IllegalAccessException
-                | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+            Object builder = builderMethod.invoke(null);
+            DynamoDbEnhancedClientExtension extension = (DynamoDbEnhancedClientExtension) builder.getClass().getMethod("build")
+                    .invoke(builder);
+            return extension;
+        } catch (ClassNotFoundException | IllegalAccessException | InvocationTargetException e) {
             LOG.error("Unable to create extension " + extensionClassName, e);
             return null;
+        } catch (NoSuchMethodException e) {
+            try {
+                return (DynamoDbEnhancedClientExtension) clazz.getDeclaredConstructor().newInstance();
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
+                LOG.error("Unable to create extension " + extensionClassName, e);
+                return null;
+            }
         }
     }
 }
