@@ -61,7 +61,7 @@ public class BeanTableSchemaSubstitutionImplementation {
             try {
                 return (T) mh.invoke();
             } catch (Exception ex) {
-                throw new IllegalStateException("GraalVM Substitution: Exception invoking getter", ex);
+                throw new IllegalStateException("GraalVM Substitution: Exception invoking constructor", ex);
             } catch (Error error) {
                 throw error;
             } catch (Throwable throwable) {
@@ -106,7 +106,7 @@ public class BeanTableSchemaSubstitutionImplementation {
             try {
                 mh.invoke(object, value);
             } catch (Exception ex) {
-                throw new IllegalStateException("GraalVM Substitution: Exception invoking getter", ex);
+                throw new IllegalStateException("GraalVM Substitution: Exception invoking setter", ex);
             } catch (Error error) {
                 throw error;
             } catch (Throwable throwable) {
