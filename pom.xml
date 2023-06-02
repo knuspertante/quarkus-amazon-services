@@ -30,6 +30,7 @@
         <module>secretsmanager</module>
         <module>docs</module>
         <module>integration-tests</module>
+        <module>integration-tests-dynamodb-without-async-client</module>
     </modules>
     <properties>
         <compiler-plugin.version>3.11.0</compiler-plugin.version>
